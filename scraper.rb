@@ -32,7 +32,7 @@ def scrape_list(url)
       email: box.css('a[href*="mailto:"]/@href').text.sub('mailto:',''),
       facebook: box.css('a[href*="facebook.com"]/@href').text,
       twitter: box.css('a[href*="twitter.com"]/@href').text,
-      image: box.css('img[src*="images/members"]/@src').text,
+      image: box.css('img.memberimage/@src').text,
       term: 2,
       source: url,
     }
