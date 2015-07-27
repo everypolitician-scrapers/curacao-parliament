@@ -45,7 +45,8 @@ end
 term = {
   id: '2',
   name: '2nd Curaçaoan Estates',
-  start_date: '2012',
+  start_date: '2012-09-11',
+  source: 'http://www.parlamento.cw/parliament/s4/',
 }
 ScraperWiki.save_sqlite([:id], term, 'terms')
 
