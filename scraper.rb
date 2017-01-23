@@ -40,14 +40,12 @@ class MemberSection < Scraped::HTML
   field :image do
     noko.css('div.photo img/@src').text
   end
-
-  field :term do
-    2
-  end
 end
 
 url = 'http://www.parlamento.cw/nederlands/huidige-leden_3173/'
-data = MembersPage.new(response: Scraped::Request.new(url: url).response).members.map(&:to_h)
+data = MembersPage.new(response: Scraped::Request.new(url: url).response).members.map do |mem|
+  mem.to_h.merge(term: 2)
+end
 # data.each { |mem| puts mem.reject { |k, v| v.to_s.empty? }.sort_by { |k, v| k }.to_h }
 
 ScraperWiki.sqliteexecute('DELETE FROM data') rescue nil
