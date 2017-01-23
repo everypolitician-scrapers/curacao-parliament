@@ -44,7 +44,7 @@ end
 
 url = 'http://www.parlamento.cw/nederlands/huidige-leden_3173/'
 data = MembersPage.new(response: Scraped::Request.new(url: url).response).members.map do |mem|
-  mem.to_h.merge(term: 2)
+  mem.to_h.merge(term: 3)
 end
 # data.each { |mem| puts mem.reject { |k, v| v.to_s.empty? }.sort_by { |k, v| k }.to_h }
 
