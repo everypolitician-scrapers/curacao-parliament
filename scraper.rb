@@ -10,26 +10,45 @@ require 'scraperwiki'
 # OpenURI::Cache.cache_path = '.cache'
 require 'scraped_page_archive/open-uri'
 
-def noko_for(url)
-  Nokogiri::HTML(open(url).read)
-end
+class MembersPage < Scraped::HTML
+  decorator Scraped::Response::Decorator::AbsoluteUrls
 
-def scrape_list(url)
-  noko = noko_for(url)
-  noko.css('div.module_bestuur div.person').each do |person|
-    image = person.css('div.photo img/@src').text
-
-    data = {
-      id:    CGI.parse(URI.parse(image).query)['fileid'].first,
-      name:  person.css('h2').text.tidy.gsub('&eacute', 'é'),
-      party: person.xpath('.//th[.="Politieke partij"]/../td').text.tidy,
-      email: person.css('a[href*="mailto:"]/@href').text.sub('mailto:', ''),
-      image: URI.join(url, image).to_s,
-      term:  2,
-    }
-    ScraperWiki.save_sqlite(%i(id term), data)
+  field :members do
+    noko.css('div.module_bestuur div.person').map do |person|
+      fragment person => MemberSection
+    end
   end
 end
 
+class MemberSection < Scraped::HTML
+  field :id do
+    CGI.parse(URI.parse(image).query)['fileid'].first
+  end
+
+  field :name do
+    noko.css('h2').text.tidy.gsub('&eacute', 'é')
+  end
+
+  field :party do
+    noko.xpath('.//th[.="Politieke partij"]/../td').text.tidy
+  end
+
+  field :email do
+    noko.css('a[href*="mailto:"]/@href').text.sub('mailto:', '')
+  end
+
+  field :image do
+    noko.css('div.photo img/@src').text
+  end
+
+  field :term do
+    2
+  end
+end
+
+url = 'http://www.parlamento.cw/nederlands/huidige-leden_3173/'
+data = MembersPage.new(response: Scraped::Request.new(url: url).response).members.map(&:to_h)
+# data.each { |mem| puts mem.reject { |k, v| v.to_s.empty? }.sort_by { |k, v| k }.to_h }
+
 ScraperWiki.sqliteexecute('DELETE FROM data') rescue nil
-scrape_list('http://www.parlamento.cw/nederlands/huidige-leden_3173/')
+ScraperWiki.save_sqlite(%i(id term), data)
