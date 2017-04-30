@@ -46,7 +46,7 @@ url = 'http://www.parlamento.cw/nederlands/huidige-leden_3173/'
 data = MembersPage.new(response: Scraped::Request.new(url: url).response).members.map do |mem|
   mem.to_h.merge(term: 3)
 end
-# data.each { |mem| puts mem.reject { |k, v| v.to_s.empty? }.sort_by { |k, v| k }.to_h }
+data.each { |mem| puts mem.reject { |_, v| v.to_s.empty? }.sort_by { |k, _| k }.to_h } if ENV['MORPH_DEBUG']
 
 ScraperWiki.sqliteexecute('DELETE FROM data') rescue nil
 ScraperWiki.save_sqlite(%i[id term], data)
