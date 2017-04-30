@@ -49,4 +49,4 @@ end
 # data.each { |mem| puts mem.reject { |k, v| v.to_s.empty? }.sort_by { |k, v| k }.to_h }
 
 ScraperWiki.sqliteexecute('DELETE FROM data') rescue nil
-ScraperWiki.save_sqlite(%i(id term), data)
+ScraperWiki.save_sqlite(%i[id term], data)
